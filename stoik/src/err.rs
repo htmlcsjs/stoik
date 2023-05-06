@@ -3,13 +3,22 @@ use std::{error::Error, fmt::Display};
 use crate::formula::{Molecule, SyntaxNode, TokenLoc};
 
 #[derive(Debug)]
+/// The error type for this crate
 pub enum StoikError {
+    /// A token is in an invalid location
     InvalidToken(TokenLoc),
+    /// An input is invalid, this is used as a generic error
     InvalidInput(String),
+    /// When a number is the first element in a compenet formula
+    /// e.g. in this `Cr2(5SO4)3` 5 would cause this, but the 3 in `3H2O` wont
     NumberFirst(TokenLoc),
+    /// Unpared parenthesis
     UnpairedParenthesis(TokenLoc),
+    /// Unpaired square bracket
     UnpairedBracket(TokenLoc),
+    /// Empty molecule
     EmptyMolecule,
+    /// Invalid syntax node and the half build molecule
     InvalidNode(SyntaxNode, Molecule),
 }
 

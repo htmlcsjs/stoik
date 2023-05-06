@@ -1,7 +1,5 @@
-//! TODO: CRATE DOCS
-
-pub mod err;
-pub mod formula;
+mod err;
+mod formula;
 
 use std::{env, time::Instant};
 

@@ -4,6 +4,29 @@ const NOT_OTHER: [char; 14] = [
     '(', '[', ')', ']', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 ];
 
+/// This is an iterator over [`Tokens`] that is constructed from a given formula
+///
+/// # Examples
+///
+/// ```
+/// use stoik::formula::{TokenStream, Token, TokenLoc};
+///
+/// let mut ts = TokenStream::new("O2");
+/// // The token's locaton is not used to check for equality, so we use the default
+/// assert_eq!(Some(Token::Atom("O".to_string(), TokenLoc::default())), ts.next());
+/// assert_eq!(Some(Token::Number(2, TokenLoc::default())), ts.next());
+/// assert_eq!(None, ts.next());
+/// ```
+///
+/// You can also use normal [`Iterator`] functions on a token stream
+///
+/// ```
+/// use stoik::formula::{TokenStream, Token};
+///
+/// let mut ts = TokenStream::new("Am(SUS)2[g]");
+/// let folded = ts.fold("".to_string(), |s, x| format!("{s} {x}"));
+/// assert_eq!(" aAm ( aS aU aS ) #2 [ og ]", folded);
+/// ```
 pub struct TokenStream<'a> {
     iter: Peekable<Chars<'a>>,
     pos: usize,
@@ -88,6 +111,8 @@ impl Iterator for TokenStream<'_> {
 }
 
 impl<'a> TokenStream<'a> {
+    /// Creates a new tokenstream from a formula, using [`chars`](str::chars)
+    /// as the backing iterator
     pub fn new(formula: &'a str) -> Self {
         Self {
             iter: formula.chars().peekable(),
@@ -97,6 +122,8 @@ impl<'a> TokenStream<'a> {
 }
 
 #[derive(Debug)]
+/// One "lexical" token in a formula. It carries along its location in a formula using [`TokenLoc`]
+/// This is intended to be generated with [`TokenStream`]
 pub enum Token {
     /// An opening square bracket - `[`
     OpenBracket(TokenLoc),
@@ -114,40 +141,113 @@ pub enum Token {
     Other(String, TokenLoc),
 }
 
-impl Display for Token {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+#[allow(dead_code)]
+impl Token {
+    /// Gets the location of a token.
+    ///
+    /// # Examples
+    /// ```
+    /// use stoik::formula::{TokenStream, TokenLoc};
+    /// let token = TokenStream::new("A").next().unwrap();
+    /// // Token::get_loc returns a poiner so we pass a referance.
+    /// assert_eq!(&TokenLoc::new(1, 1), token.get_loc());
+    /// ```
+    pub fn get_loc(&self) -> &TokenLoc {
         match self {
-            Token::OpenBracket(_) => write!(f, "`[`"),
-            Token::CloseBracket(_) => write!(f, "`]`"),
-            Token::OpenParen(_) => write!(f, "`(`"),
-            Token::CloseParen(_) => write!(f, "`)`"),
-            Token::Number(n, _) => write!(f, "#`{n}`"),
-            Token::Atom(s, _) => write!(f, "a`{s}`"),
-            Token::Other(s, _) => write!(f, "o`{s}`"),
+            Token::OpenBracket(loc) => loc,
+            Token::CloseBracket(loc) => loc,
+            Token::OpenParen(loc) => loc,
+            Token::CloseParen(loc) => loc,
+            Token::Number(_, loc) => loc,
+            Token::Atom(_, loc) => loc,
+            Token::Other(_, loc) => loc,
         }
     }
 }
 
-#[derive(Debug)]
+impl PartialEq for Token {
+    fn eq(&self, other: &Self) -> bool {
+        // ignore tokenloc for equalites
+        match (self, other) {
+            (Self::OpenBracket(_), Self::OpenBracket(_)) => true,
+            (Self::CloseBracket(_), Self::CloseBracket(_)) => true,
+            (Self::OpenParen(_), Self::OpenParen(_)) => true,
+            (Self::CloseParen(_), Self::CloseParen(_)) => true,
+            (Self::Number(lhs, _), Self::Number(rhs, _)) => lhs == rhs,
+            (Self::Atom(lhs, _), Self::Atom(rhs, _)) => lhs == rhs,
+            (Self::Other(lhs, _), Self::Other(rhs, _)) => lhs == rhs,
+            _ => false,
+        }
+    }
+}
+impl Eq for Token {}
+
+impl Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Token::OpenBracket(_) => write!(f, "["),
+            Token::CloseBracket(_) => write!(f, "]"),
+            Token::OpenParen(_) => write!(f, "("),
+            Token::CloseParen(_) => write!(f, ")"),
+            Token::Number(n, _) => write!(f, "#{n}"),
+            Token::Atom(s, _) => write!(f, "a{s}"),
+            Token::Other(s, _) => write!(f, "o{s}"),
+        }
+    }
+}
+
+#[derive(Debug, Default, PartialEq, Eq)]
+/// The location of one token in a formula. Used for debugging and error reporting
+///
+/// # Examples
+///
+/// ```
+/// use stoik::formula::{TokenStream, TokenLoc};
+///
+/// let mut ts = TokenStream::new("Rh2(SO4)3");
+/// let paren = ts.find(|x| x.to_string() == "(").unwrap();
+/// // Token::get_loc returns a poiner so we pass a referance.
+/// assert_eq!(&TokenLoc::new(4, 1), paren.get_loc());
+/// ```
 pub struct TokenLoc {
     start: usize,
     len: usize,
 }
 
 impl TokenLoc {
+    /// Constructs a new tokenloc from a start pos and a length
     pub fn new(start: usize, len: usize) -> Self {
         Self { start, len }
     }
 
+    /// Prints a message with the relevant bit of the formula highlighted
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use stoik::formula::TokenLoc;
+    ///
+    /// TokenLoc::new(1, 1).print_msg("12345", "numbers", "one");
+    /// // This prints
+    /// // numbers: 12345
+    /// //          ^
+    /// //          one
+    /// TokenLoc::new(3, 2).print_msg("12345", "numbers", "hey look\n3+4=7");
+    /// // This prints
+    /// // numbers: 12345
+    /// //            ^^
+    /// //            hey look
+    /// //            3+4=7
     pub fn print_msg(&self, formula: &str, msg: &str, diag: &str) {
+        let lines = diag.lines().collect::<Vec<_>>();
+
         println!("{msg}: {formula}");
         println!(
             "{}{}",
             " ".repeat(msg.len() + 1 + self.start),
             "^".repeat(self.len)
         );
-        println!("{}|", " ".repeat(msg.len() + 1 + self.start));
-        for s in diag.split('\n') {
+        for s in lines {
             println!("{}{}", " ".repeat(msg.len() + 1 + self.start), s);
         }
     }

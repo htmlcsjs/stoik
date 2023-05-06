@@ -1,3 +1,19 @@
+//! This module is the main module for parsing chemical equasions
+//!
+//! See the documentaion for [`Molecule`], [`assemble_tree`], [`TokenStream`] for more info
+//! ```
+//! use stoik::formula::*;
+//!
+//! let mut ts = TokenStream::new("Rh2(SO4)3");
+//! assert_eq!(Some(Token::Atom("Rh".to_owned(), TokenLoc::default())), ts.next());
+//! let tree = assemble_tree(ts)?;
+//! let mut mol = Molecule::construct_from_tree(tree)?;
+//!
+//! mol.increase_atom("O", 3);
+//!
+//! assert_eq!(Molecule::from_formula("2(SO5)3")?, mol);
+//! # Ok::<(), stoik::StoikError>(())
+//! ```
 mod tokenstream;
 
 use std::{
@@ -49,7 +65,7 @@ pub enum SyntaxNode {
 /// let ts = TokenStream::new("O2");
 /// let tree = assemble_tree(ts)?;
 /// assert_eq!(tree, SyntaxNode::Multiplier { node: Box::new(SyntaxNode::Atom("O".to_string())), mul: 2 });
-/// # Ok::<(), stoik::err::StoikError>(())
+/// # Ok::<(), stoik::StoikError>(())
 /// ```
 pub fn assemble_tree(mut stream: impl Iterator<Item = Token>) -> Result<SyntaxNode, StoikError> {
     match stream.next() {
@@ -151,13 +167,15 @@ fn internal_tree(
 ///
 /// assert_eq!(mol.get_count("Rh"), 2);
 /// assert_eq!(mol.get_count("O"), 12);
-/// # Ok::<(), stoik::err::StoikError>(())
+/// # Ok::<(), stoik::StoikError>(())
 /// ```
 pub struct Molecule {
+    /// The mole count of the molecule
     pub moles: i64,
     map: HashMap<String, i64>,
 }
 
+#[allow(dead_code)]
 impl Molecule {
     /// Increases the count of an atom in the molecule.
     ///
@@ -168,16 +186,16 @@ impl Molecule {
     /// ```
     /// use stoik::formula::Molecule;
     ///
-    /// let mut oxygen = Molecule::from_formula("O2")?;
-    /// oxygen.increase_atom("O", 1);
-    /// assert_eq!(oxygen.get_count("O"), 3);
+    /// let mut oxygen = Molecule::from_formula("O3")?;
+    /// oxygen.increase_atom("O", -1);
+    /// assert_eq!(oxygen.get_count("O"), 2);
     /// oxygen.increase_atom("Rh", 1);
     /// assert_eq!(oxygen.get_count("Rh"), 1);
     ///
     /// let mut mol = Molecule::from_formula("2 H2O")?;
     /// mol.increase_atom("O", 1);
     /// assert_eq!(mol.get_count("O"), 4);
-    /// # Ok::<(), stoik::err::StoikError>(())
+    /// # Ok::<(), stoik::StoikError>(())
     /// ```
     pub fn increase_atom(&mut self, atom: &str, n: i64) {
         if let Some(count) = self.map.get_mut(atom) {
@@ -236,8 +254,8 @@ impl Molecule {
     /// assert_eq!(oxygen.get_count("O"), 2);
     ///
     /// let water = Molecule::from_formula("2 H2O")?;
-    /// assert_eq!(mol.get_count("H"), 4);
-    /// # Ok::<(), stoik::err::StoikError>(())
+    /// assert_eq!(water.get_count("H"), 4);
+    /// # Ok::<(), stoik::StoikError>(())
     /// ```
     pub fn get_count(&self, atom: &str) -> i64 {
         *self.map.get(atom).unwrap_or(&0) * self.moles
@@ -254,10 +272,26 @@ impl Molecule {
     /// let mol = Molecule::construct_from_tree(tree)?;
     ///
     /// assert_eq!(mol, Molecule::from_formula("Rh2(SO4)3")?);
-    /// # Ok::<(), stoik::err::StoikError>(())
+    /// # Ok::<(), stoik::StoikError>(())
     /// ```
     pub fn from_formula(formula: &str) -> Result<Self, StoikError> {
         Self::construct_from_tree(assemble_tree(TokenStream::new(formula))?)
+    }
+
+    /// Gets the molecule in map form, taking into account `moles`
+    ///
+    /// # Examples
+    /// ```
+    /// use stoik::formula::Molecule;
+    /// let mol = Molecule::from_formula("2 H2O")?;
+    /// let map = mol.get_map();
+    /// assert_eq!(Some(4), map.get("H"));
+    /// assert_eq!(None, map.get("S"));
+    pub fn get_map(&self) -> HashMap<String, i64> {
+        self.map
+            .iter()
+            .map(|(s, x)| (s.clone(), x * self.moles))
+            .collect()
     }
 }
 
