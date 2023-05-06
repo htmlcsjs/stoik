@@ -10,7 +10,7 @@
 //! use stoik::StoikError;
 //!
 //! let formula = "Rh2(SO4)3";
-//! match crate::formula::Molecule::from_formula(formula) {
+//! match Molecule::from_formula(formula) {
 //!     Err(e) => match e {
 //!         StoikError::InvalidToken(loc) => {
 //!             loc.print_msg(formula, "Malformed formula", "Illegal token")

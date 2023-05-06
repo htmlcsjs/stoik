@@ -285,8 +285,9 @@ impl Molecule {
     /// use stoik::formula::Molecule;
     /// let mol = Molecule::from_formula("2 H2O")?;
     /// let map = mol.get_map();
-    /// assert_eq!(Some(4), map.get("H"));
+    /// assert_eq!(Some(&4), map.get("H"));
     /// assert_eq!(None, map.get("S"));
+    /// # Ok::<(), stoik::StoikError>(())
     pub fn get_map(&self) -> HashMap<String, i64> {
         self.map
             .iter()
