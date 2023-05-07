@@ -4,7 +4,7 @@ const NOT_OTHER: [char; 14] = [
     '(', '[', ')', ']', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 ];
 
-/// This is an iterator over [`Tokens`] that is constructed from a given formula
+/// This is an iterator over [`Token`] that is constructed from a given formula
 ///
 /// # Examples
 ///

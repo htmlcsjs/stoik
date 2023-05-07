@@ -1,2 +1,2 @@
 [workspace]
-members = ["stoik"]
+members = ["stoik", "stoik-gui"]
