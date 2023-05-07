@@ -1,6 +1,7 @@
 use eframe::{App, CreationContext, Frame};
 use egui::{CentralPanel, Context};
 
+#[allow(unused)]
 pub const APP_NAME: &str = "stoik-gui";
 
 #[derive(Default)]
