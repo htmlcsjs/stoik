@@ -1,4 +1,4 @@
-use app::{StoikApp, APP_NAME};
+use app::{StoikApp, APP_NAME, APP_NAME_FORMATTED};
 
 mod app;
 
@@ -18,12 +18,12 @@ fn main() {
         ..Default::default()
     };
     match eframe::run_native(
-        APP_NAME,
+        APP_NAME_FORMATTED,
         options,
         Box::new(|cctx| Box::new(StoikApp::new(cctx))),
     ) {
         Ok(()) => (),
-        Err(e) => println!("Error running stoik-gui: {e}"), // TODO, better error handling
+        Err(e) => println!("Error running {APP_NAME}: {e}"), // TODO, better error handling
     }
 }
 
