@@ -37,6 +37,7 @@ impl StoikApp {
 // TODO: persistance
 impl App for StoikApp {
     fn update(&mut self, ctx: &Context, frame: &mut Frame) {
+        log::info!("SUS");
         TopBottomPanel::top(id("top")).show(ctx, |ui| {
             trace!(ui);
             ui.horizontal(|ui| {

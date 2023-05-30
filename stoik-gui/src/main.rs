@@ -1,24 +1,23 @@
 #[allow(unused_imports)]
 use app::{APP_NAME, APP_NAME_FORMATTED};
 
-include! {"lib.rs"}
-
-#[cfg(not(target_arch = "wasm32"))]
-include! {concat!(env!("OUT_DIR"), "/icon.rs")}
+mod app;
+mod util;
+pub use app::StoikApp;
 
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
     use eframe::{IconData, NativeOptions};
 
     let options = NativeOptions {
-        icon_data: Some(IconData {
-            rgba: Vec::from(ICON_BYTES),
-            width: ICON_SIZE.0,
-            height: ICON_SIZE.1,
-        }),
+        icon_data: Some(
+            IconData::try_from_png_bytes(include_bytes!("../assets/icon-512.png")).expect("sus"),
+        ),
 
         ..Default::default()
     };
+
+    env_logger::init();
 
     match eframe::run_native(
         APP_NAME_FORMATTED,
@@ -26,27 +25,17 @@ fn main() {
         Box::new(|cctx| Box::new(StoikApp::new(cctx))),
     ) {
         Ok(()) => (),
-        Err(e) => println!("Error running {APP_NAME}: {e}"), // TODO, better error handling
+        Err(e) => log::error!("Error running {APP_NAME}: {e}"), // TODO, better error handling
     }
 }
 
 #[cfg(target_arch = "wasm32")]
 fn main() {
-    // Make sure panics are logged using `console.error`.
-    console_error_panic_hook::set_once();
-
-    // Redirect tracing to console.log and friends:
-    tracing_wasm::set_as_global_default();
-
-    let web_options = eframe::WebOptions::default();
-
-    wasm_bindgen_futures::spawn_local(async {
-        eframe::start_web(
-            APP_NAME, // hardcode it
-            web_options,
-            Box::new(|cc| Box::new(StoikApp::new(cc))),
-        )
-        .await
-        .expect("failed to start eframe");
+    let handle = wasm::WebHandle::new();
+    wasm_bindgen_futures::spawn_local(async move {
+        match handle.start(APP_NAME).await {
+            Ok(()) => (),
+            Err(e) => log::error!("{e:?}"),
+        }
     });
 }
