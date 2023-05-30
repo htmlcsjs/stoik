@@ -39,23 +39,24 @@ fn main() {
                 Some(tree)
             }
             Err(e) => {
-                match e {
+                let msg = match e {
                     StoikError::InvalidToken(loc) => {
-                        loc.print_msg(&args[i], "Malformed formula", "Illegal token")
+                        loc.format_msg(&args[i], "Malformed formula", "Illegal token")
                     }
-                    StoikError::NumberFirst(loc) => loc.print_msg(
+                    StoikError::NumberFirst(loc) => loc.format_msg(
                         &args[i],
                         "Malformed formula",
-                        "Compound groups cannot start\nwith numbers",
+                        "Compound groups cannot start with numbers",
                     ),
                     StoikError::UnpairedParenthesis(loc) => {
-                        loc.print_msg(&args[i], "Malformed formula", "Unpaired parenthesis")
+                        loc.format_msg(&args[i], "Malformed formula", "Unpaired parenthesis")
                     }
                     StoikError::UnpairedBracket(loc) => {
-                        loc.print_msg(&args[i], "Malformed formula", "Unpaired bracket")
+                        loc.format_msg(&args[i], "Malformed formula", "Unpaired bracket")
                     }
-                    e => println!("{e}"),
+                    e => e.to_string(),
                 };
+                println!("{msg}");
                 None
             }
         })
@@ -70,7 +71,7 @@ fn main() {
 
     for (i, mole) in molecules.into_iter().enumerate() {
         match mole {
-            Ok(mole) => println!("{} -> {mole:?}", args[i]),
+            Ok(mole) => println!("{} -> {mole}", args[i]),
             Err(e) => println!("Error with {}: {e}", args[i]),
         }
     }

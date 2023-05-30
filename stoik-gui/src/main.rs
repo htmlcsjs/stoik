@@ -1,7 +1,9 @@
-use app::{StoikApp, APP_NAME, APP_NAME_FORMATTED};
+#[allow(unused_imports)]
+use app::{APP_NAME, APP_NAME_FORMATTED};
 
-mod app;
+include! {"lib.rs"}
 
+#[cfg(not(target_arch = "wasm32"))]
 include! {concat!(env!("OUT_DIR"), "/icon.rs")}
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -17,6 +19,7 @@ fn main() {
 
         ..Default::default()
     };
+
     match eframe::run_native(
         APP_NAME_FORMATTED,
         options,

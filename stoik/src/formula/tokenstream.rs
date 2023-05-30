@@ -227,28 +227,28 @@ impl TokenLoc {
     /// ```
     /// use stoik::formula::TokenLoc;
     ///
-    /// TokenLoc::new(1, 1).print_msg("12345", "numbers", "one");
-    /// // This prints
-    /// // numbers: 12345
-    /// //          ^
-    /// //          one
-    /// TokenLoc::new(3, 2).print_msg("12345", "numbers", "hey look\n3+4=7");
+    /// let msg1 = TokenLoc::new(1, 1).format_msg("12345", "numbers", "one");
+    /// assert_eq!("numbers: 12345
+    ///          ^
+    ///          one", msg1);
+    ///
+    /// println!("{}", TokenLoc::new(3, 2).format_msg("12345", "numbers", "hey look\n3+4=7"));
     /// // This prints
     /// // numbers: 12345
     /// //            ^^
     /// //            hey look
     /// //            3+4=7
-    pub fn print_msg(&self, formula: &str, msg: &str, diag: &str) {
+    pub fn format_msg(&self, formula: &str, msg: &str, diag: &str) -> String {
         let lines = diag.lines().collect::<Vec<_>>();
-
-        println!("{msg}: {formula}");
-        println!(
-            "{}{}",
+        let mut return_msg = format!("{msg}: {formula}");
+        return_msg += &format!(
+            "\n{}{}",
             " ".repeat(msg.len() + 1 + self.start),
             "^".repeat(self.len)
         );
         for s in lines {
-            println!("{}{}", " ".repeat(msg.len() + 1 + self.start), s);
+            return_msg += &format!("\n{}{}", " ".repeat(msg.len() + 1 + self.start), s);
         }
+        return_msg
     }
 }
