@@ -155,7 +155,7 @@ fn internal_tree(
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 /// A repesentaion of a molecule used for stoichiometric puroposies
 ///
 /// # Examples

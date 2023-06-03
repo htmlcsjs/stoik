@@ -11,7 +11,7 @@ macro_rules! function {
 
 macro_rules! trace {
     ($ui: expr) => {
-        egui::trace!($ui, $crate::util::function!())
+        egui::trace!($ui, $crate::macros::function!())
     };
 }
 

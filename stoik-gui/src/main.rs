@@ -2,7 +2,7 @@
 use app::{APP_NAME, APP_NAME_FORMATTED};
 
 mod app;
-mod util;
+mod macros;
 pub use app::StoikApp;
 
 #[cfg(not(target_arch = "wasm32"))]
