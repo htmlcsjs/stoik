@@ -165,7 +165,7 @@ impl StoikApp {
                     .monospace(),
             );
         } else if !self.mode_data.lhs_mols.is_empty() && !self.mode_data.rhs_mols.is_empty() {
-            self.show_balance_summery(ui);
+            self.show_balance_summary(ui);
         }
     }
 
@@ -346,7 +346,7 @@ impl StoikApp {
         }
     }
 
-    fn show_balance_summery(&mut self, ui: &mut Ui) {
+    fn show_balance_summary(&mut self, ui: &mut Ui) {
         if self.mode_data.changed {
             self.mode_data.lhs.clear();
             self.mode_data.rhs.clear();
@@ -376,9 +376,9 @@ impl StoikApp {
         let balanced = self.mode_data.balanced.values().all(|x| *x);
 
         if balanced {
-            ui.heading("Your equasion is balanced");
+            ui.heading("Your equation is balanced");
         } else {
-            ui.heading("Your equasion is not balanced");
+            ui.heading("Your equation is not balanced");
         }
 
         if self.all_atoms || !balanced {

@@ -1,4 +1,4 @@
-//! This module is the main module for parsing chemical equasions
+//! This module is the main module for parsing chemical equations
 //!
 //! See the documentaion for [`Molecule`], [`assemble_tree`], [`TokenStream`] for more info
 //! ```
@@ -56,7 +56,7 @@ pub enum SyntaxNode {
 /// It requires an iterator of [`Token`] passed to it, idealy to be
 /// based off of [`TokenStream`]
 ///
-/// # Exampless
+/// # Examples
 ///
 /// Basic usage:
 /// ```

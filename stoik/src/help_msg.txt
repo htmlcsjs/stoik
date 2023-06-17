@@ -1,0 +1,8 @@
+Usage: stoik [FLAGS] ... [EQUATION] ...
+Computes whether EQUATION is chemically balanced or not
+
+All non-flag args are concatonated together to form EQUATION
+e.g. `stoik A + B -> C + D` is the same as `stoik "A + B -> C + D"`
+
+  -t, --time           Shows the time taken for the processing of each formula
+  -h, --help           Shows this
