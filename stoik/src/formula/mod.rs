@@ -21,13 +21,13 @@ use std::{
     fmt::{Debug, Display},
 };
 
-use serde::{Deserialize, Serialize};
 pub use tokenstream::*;
 
 use crate::err::StoikError;
 
 /// A node in a parsed chemical equation syntax tree
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SyntaxNode {
     /// A subcompund, like the `(SO4)` in `Rh2(SO4)3`
     Subcompound(Vec<SyntaxNode>),
@@ -155,7 +155,8 @@ fn internal_tree(
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// A repesentaion of a molecule used for stoichiometric puroposies
 ///
 /// # Examples

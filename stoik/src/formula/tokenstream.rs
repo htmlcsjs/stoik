@@ -122,6 +122,7 @@ impl<'a> TokenStream<'a> {
 }
 
 #[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// One "lexical" token in a formula. It carries along its location in a formula using [`TokenLoc`]
 /// This is intended to be generated with [`TokenStream`]
 pub enum Token {
@@ -197,6 +198,7 @@ impl Display for Token {
 }
 
 #[derive(Debug, Default, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// The location of one token in a formula. Used for debugging and error reporting
 ///
 /// # Examples

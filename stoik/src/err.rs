@@ -3,6 +3,7 @@ use std::{error::Error, fmt::Display};
 use crate::formula::{Molecule, SyntaxNode, TokenLoc};
 
 #[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// The error type for this crate
 pub enum StoikError {
     /// A token is in an invalid location
