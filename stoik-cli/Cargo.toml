@@ -1,12 +1,12 @@
 [package]
-name = "stoik"
+name = "stoik-cli"
 version = "0.0.0"
 edition = "2021"
+default-run = "stoik-cli"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"], optional = true }
+stoik = { path = "../stoik" }
 
-[features]
-serde = ["dep:serde"]
+

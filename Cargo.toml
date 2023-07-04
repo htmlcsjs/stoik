@@ -1,5 +1,5 @@
 [workspace]
-members = ["stoik", "stoik-gui"]
+members = ["stoik", "stoik-gui", "stoik-cli"]
 
 [profile.release]
 opt-level = 2 # fast and small wasm

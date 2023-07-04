@@ -2183,6 +2183,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "stoik-cli"
+version = "0.0.0"
+dependencies = [
+ "stoik",
+]
+
+[[package]]
 name = "stoik-gui"
 version = "0.0.0"
 dependencies = [

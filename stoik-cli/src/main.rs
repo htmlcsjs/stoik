@@ -1,14 +1,13 @@
-mod err;
-mod formula;
-
 use std::{
     collections::{hash_map::Entry, HashMap},
     env,
     time::Instant,
 };
 
-use err::StoikError;
-use formula::{Molecule, TokenStream};
+use stoik::{
+    formula::{self, Molecule, TokenStream},
+    StoikError,
+};
 
 const HELP_MSG: &str = include_str!("help_msg.txt");
 
@@ -103,8 +102,8 @@ fn main() {
             .collect::<Vec<_>>();
         for (element, bal) in balanced {
             if !bal || all_moles {
-                table[1].push(lhs[&element].to_string());
-                table[2].push(rhs[&element].to_string());
+                table[1].push(lhs.get(&element).unwrap_or(&0).to_string());
+                table[2].push(rhs.get(&element).unwrap_or(&0).to_string());
                 table[0].push(element);
                 table[3].push(bal.to_string());
             }
@@ -222,7 +221,7 @@ fn pad_string(input: &String, length: usize) -> String {
 fn construct_mole(
     formula: &str,
     time_mode: bool,
-    time_table: &mut Vec<Vec<String>>,
+    time_table: &mut [Vec<String>],
 ) -> Result<Molecule, StoikError> {
     if time_mode {
         time_table[0].push(formula.to_string());
