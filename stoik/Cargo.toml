@@ -2,6 +2,14 @@
 name = "stoik"
 version = "0.1.0"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Libary to parse molecular formulas"
+homepage = "https://github.com/htmlcsjs/stoik"
+repository = "https://github.com/htmlcsjs/stoik"
+readme = "README.md"
+keywords = ["parser", "parsing"]
+categories = ["science"]
+authors = ["htmlcsjs"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
