@@ -12,7 +12,6 @@ use stoik::{
 const HELP_MSG: &str = include_str!("help_msg.txt");
 
 fn main() {
-    // C30H64N2O2Si4 (s) + C8H4Cl2O2 (s) -> C26H38N2O4Si2 (s) + 2C6H15ClSi (s)
     let mut time_mode = false;
     let mut all_moles = false;
     let mut equation = String::new();
