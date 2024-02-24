@@ -16,7 +16,7 @@ fn main() {
     let mut time_mode = false;
     let mut all_moles = false;
     let mut equation = String::new();
-    let mut time_table = vec!["Formula", "Tokenise", "Tree building", "Parsing", "Total"]
+    let mut time_table = ["Formula", "Tokenise", "Tree building", "Parsing", "Total"]
         .iter()
         .map(|x| vec![x.to_string()])
         .collect::<Vec<_>>();
@@ -96,7 +96,7 @@ fn main() {
     }
 
     if !is_balanced || all_moles {
-        let mut table = vec!["Element", "Reactants", "Products", "Balanced"]
+        let mut table = ["Element", "Reactants", "Products", "Balanced"]
             .iter()
             .map(|x| vec![x.to_string()])
             .collect::<Vec<_>>();

@@ -1,4 +1,5 @@
 # stoik
+
 Stoicimetic utilities written in rust.
 
 ## License
