@@ -4,7 +4,8 @@ use crate::formula::{Molecule, SyntaxNode, TokenLoc};
 
 #[derive(Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// The error type for this crate
+#[non_exhaustive]
+/// The error type used for this crate's api
 pub enum StoikError {
     /// A token is in an invalid location
     InvalidToken(TokenLoc),
