@@ -12,8 +12,6 @@ use egui_extras::{Column, TableBody, TableBuilder};
 use stoik::{formula::Molecule, StoikError};
 use strum::{EnumIter, IntoEnumIterator};
 
-use crate::macros::trace;
-
 #[allow(unused)]
 pub const APP_NAME: &str = "stoik-gui";
 pub const APP_NAME_FORMATTED: &str = "Stoik GUI";
@@ -29,12 +27,12 @@ pub struct StoikApp {
 impl StoikApp {
     pub fn new(cctx: &CreationContext) -> Self {
         // customise eframe here using cctx
-        let mut style = (*cctx.egui_ctx.style()).clone();
-        for (_, font_id) in style.text_styles.iter_mut() {
-            font_id.size *= 14.0 / 12.0
-        }
+        cctx.egui_ctx.all_styles_mut(|style| {
+            for (_, font_id) in style.text_styles.iter_mut() {
+                font_id.size *= 14.0 / 12.0
+            }
+        });
 
-        cctx.egui_ctx.set_style(style);
         Self::default()
     }
 }
@@ -44,7 +42,6 @@ impl App for StoikApp {
     fn update(&mut self, ctx: &Context, frame: &mut Frame) {
         log::info!("started");
         TopBottomPanel::top(id("top")).show(ctx, |ui| {
-            trace!(ui);
             ui.horizontal(|ui| {
                 ui.visuals_mut().button_frame = false;
                 self.top_bar(ui, frame);
@@ -52,8 +49,6 @@ impl App for StoikApp {
         });
 
         SidePanel::left(id("settings")).show_animated(ctx, self.settings_open, |ui| {
-            trace!(ui);
-
             ui.vertical_centered(|ui| {
                 ui.heading("⚙ Settings");
             });
@@ -62,10 +57,6 @@ impl App for StoikApp {
         });
 
         CentralPanel::default().show(ctx, |ui| self.main_win(ui, frame, self.display_mode));
-
-        if !frame.is_web() {
-            egui::gui_zoom::zoom_with_keyboard_shortcuts(ctx, frame.info().native_pixels_per_point);
-        }
     }
 }
 
@@ -109,7 +100,7 @@ impl StoikApp {
 
         ui.horizontal(|ui| {
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                widgets::global_dark_light_mode_switch(ui);
+                widgets::global_theme_preference_switch(ui);
                 ui.separator();
                 egui::warn_if_debug_build(ui);
             });
@@ -117,22 +108,13 @@ impl StoikApp {
     }
 
     fn settings_panel(&mut self, ui: &mut Ui, _frame: &mut Frame) {
-        trace!(ui);
-
-        #[cfg(debug_assertions)]
-        {
-            let mut debug_on_hover = ui.ctx().debug_on_hover();
-            ui.checkbox(&mut debug_on_hover, "Debug on hover")
-                .on_hover_text("Show structure of the ui when you hover with the mouse");
-            ui.ctx().set_debug_on_hover(debug_on_hover);
-        }
-
         let mut style = (*ui.ctx().style()).clone();
         let mut text_size = style.text_styles.get(&TextStyle::Monospace).unwrap().size;
 
         ui.label("Text size");
-        let response = ui.add(Slider::new(&mut text_size, 1.0..=36.0).clamp_to_range(false));
-        if response.drag_released() || response.lost_focus() {
+        let response =
+            ui.add(Slider::new(&mut text_size, 1.0..=36.0).clamping(egui::SliderClamping::Edits));
+        if response.drag_stopped() || response.lost_focus() {
             let mut text_styles = egui::style::default_text_styles();
             if text_size < 1.0 {
                 text_size = 14.0;
@@ -151,8 +133,6 @@ impl StoikApp {
     }
 
     fn main_win(&mut self, ui: &mut Ui, _frame: &mut Frame, mode: Mode) {
-        trace!(ui);
-
         match mode {
             Mode::Text => self.ui_text(ui),
             Mode::List => self.ui_list(ui),
@@ -170,7 +150,6 @@ impl StoikApp {
     }
 
     fn ui_text(&mut self, ui: &mut Ui) {
-        trace!(ui);
         ui.heading(RichText::new("Formula"));
         let mut input = self.mode_data.text_input.clone();
         let res = ui.add(
@@ -230,8 +209,6 @@ impl StoikApp {
     }
 
     fn ui_list(&mut self, ui: &mut Ui) {
-        trace!(ui);
-
         ui.heading("LHS");
         let mut to_del = None;
         for (i, (_, formula)) in self.mode_data.lhs_mols.iter().enumerate() {
